@@ -133,6 +133,7 @@ class ComposedModel(nn.Module):
         self,
         image_module: Optional[ImageModule] = None,
         cloud_module: Optional[CloudModule] = None,
+        text_module: Optional[FusionTextModel] = None,
         fusion_module: Optional[FusionModule] = None,
     ) -> None:
         """Composition model for multimodal architectures.
@@ -146,6 +147,8 @@ class ComposedModel(nn.Module):
 
         self.image_module = image_module
         self.cloud_module = cloud_module
+        # ADDED here text_module
+        self.text_module = text_module
         self.fusion_module = fusion_module
         if self.cloud_module:
             self.sparse_cloud = self.cloud_module.sparse
@@ -155,6 +158,8 @@ class ComposedModel(nn.Module):
             "image": None,
             "cloud": None,
             "fusion": None,
+            # ADDED here text
+            "text": None,
         }
 
         if self.image_module is not None:
@@ -169,5 +174,9 @@ class ComposedModel(nn.Module):
 
         if self.fusion_module is not None:
             out_dict["fusion"] = self.fusion_module(out_dict)
+
+        # ADDED here text_module
+        if self.text_module is not None:
+            out_dict["text"] = self.text_module(batch["back_embs"], batch["front_embs"])
 
         return out_dict
