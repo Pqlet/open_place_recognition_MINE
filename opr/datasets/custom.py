@@ -19,7 +19,8 @@ class PhystechCampus(BaseDataset):
     """Phystech Campus dataset implementation."""
 
     valid_subsets = ("train", "val", "test")
-    valid_modalities = ("image", "cloud")
+    # ADDED modality text
+    valid_modalities = ("image", "cloud", "text")
 
     def __init__(
         self,
@@ -81,6 +82,13 @@ class PhystechCampus(BaseDataset):
             pc_filepath = track_dir / self.clouds_subdir / f"{row['lidar_ts']}.bin"
             pc = self._load_pc(pc_filepath)
             data["cloud"] = pc
+        # ADDED the case for text
+        if "text" in self.modalities:
+            # data["back_description"] = row["back_description"]
+            # data["front_description"] = row["front_description"]
+            data["text_emb_back"] = self.text_transform(row["back_description"])
+            data["text_emb_front"] = self.text_transform(row["front_description"])
+
         return data
 
     def _load_pc(self, filepath: Union[str, Path]) -> Tensor:
