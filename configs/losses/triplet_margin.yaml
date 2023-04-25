@@ -1,6 +1,7 @@
 _target_: opr.losses.MultimodalTripletMarginLoss
 
-margin: 0.2
+# changed from 0.2
+margin: 0.4
 swap: True
 distance:
   _target_: pytorch_metric_learning.distances.LpDistance
