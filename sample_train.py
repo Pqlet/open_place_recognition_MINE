@@ -16,6 +16,8 @@ EPOCHS = 60
 IMAGE_LR = 0.0001
 CLOUD_LR = 0.001
 FUSION_LR = 0.001
+# ADDED text lr
+TEXT_LR = 0.001
 WEIGHT_DECAY = 0.0001
 
 SCHEDULER_GAMMA = 0.1
@@ -29,13 +31,15 @@ CHECKPOINTS_DIR = Path("checkpoints")
 if __name__ == "__main__":
     # ==========> INITIALIZATION:
 
+    # ILYA put here text_model.yaml
     model_config = OmegaConf.load("configs/models/minkloc_multimodal.yaml")
     model = instantiate(model_config)
 
+    # ILYA put here triplet_margin_text
     loss_cfg = OmegaConf.load("configs/losses/triplet_margin.yaml")
     loss_fn = instantiate(loss_cfg)
 
-    dataset_cfg = OmegaConf.load("configs/datasets/oxford.yaml")
+    dataset_cfg = OmegaConf.load("configs/datasets/phystech_campus_text.yaml")
     dataloaders = make_dataloaders(
         dataset_cfg=dataset_cfg.dataset,
         batch_sampler_cfg=dataset_cfg.sampler,
@@ -49,6 +53,9 @@ if __name__ == "__main__":
         params_list.append({"params": model.cloud_module.parameters(), "lr": CLOUD_LR})
     if model.fusion_module is not None and FUSION_LR is not None:
         params_list.append({"params": model.fusion_module.parameters(), "lr": FUSION_LR})
+    # ADDED text_module
+    if model.text_module is not None and TEXT_LR is not None:
+        params_list.append({"params": model.text_module.parameters(), "lr": TEXT_LR})
     optimizer = Adam(params_list, weight_decay=WEIGHT_DECAY)
     scheduler = MultiStepLR(optimizer, milestones=SCHEDULER_STEPS, gamma=SCHEDULER_GAMMA)
 
